@@ -10,8 +10,15 @@ resource "aws_iam_role" "lambda_role" {
   })
 }
 
+# API for service 'ecr' not yet implemented or pro feature
+# resource "aws_ecr_repository" "send_to_s3_repo" {
+#   name = "send-to-s3-lambda-repo"
+# }
+
 resource "aws_lambda_function" "send_to_s3_lambda" {
   function_name    = "send-to-s3-lambda"
+#   package_type  = "Image"
+#   image_uri     = "${aws_ecr_repository.send_to_s3_repo.repository_url}:latest"
   role             = aws_iam_role.lambda_role.arn
   handler          = "index.handler"
   runtime          = "nodejs22.x"
@@ -25,4 +32,17 @@ resource "aws_lambda_function" "send_to_s3_lambda" {
   }
 
   depends_on = [aws_iam_role.lambda_role]
+}
+
+# Привязываем очередь SQS к Lambda функции
+resource "aws_lambda_event_source_mapping" "send_to_s3_lambda_trigger" {
+  event_source_arn = aws_sqs_queue.sand_to_s3.arn
+  function_name    = aws_lambda_function.send_to_s3_lambda.arn
+  batch_size       = 1
+  enabled          = true
+
+  depends_on = [
+    aws_lambda_function.send_to_s3_lambda,
+    aws_sqs_queue.sand_to_s3
+  ]
 }

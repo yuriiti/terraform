@@ -5,12 +5,14 @@ services:
     ports:
       - '${LOCALSTACK_PORT}:4566'
     environment:
-      - SERVICES=apigateway,iam,sns,sqs,lambda,s3,cloudwatch,cloudwatchlogs,ses
+      - SERVICES=apigateway,iam,sns,sqs,lambda,s3,cloudwatch,cloudwatchlogs,ses,ecr
       - AWS_ACCESS_KEY_ID=${TF_VAR_aws_access_key_id}
       - AWS_SECRET_ACCESS_KEY=${TF_VAR_aws_secret_access_key}
     volumes:
       - ./volume:/var/lib/localstack
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - localstack_network
 
   awscli:
     image: amazon/aws-cli:latest
@@ -22,41 +24,42 @@ services:
       AWS_DEFAULT_REGION: ${TF_VAR_aws_region}
     depends_on:
       - localstack
+    networks:
+      - localstack_network
 
-  terraform:
-    image: hashicorp/terraform:latest
-    container_name: terraform
-    working_dir: /workspace
-    entrypoint: []
-    command:
-      - /bin/sh
-      - -c
-      - |
-        terraform init \
-        && terraform apply -auto-approve
-    env_file:
-      - .env.local
-    volumes:
-      - ./services:/workspace/services:delegated
-      - ./terraform:/workspace:delegated
-    depends_on:
-      - localstack
+  # terraform:
+  #   image: hashicorp/terraform:latest
+  #   container_name: terraform
+  #   working_dir: /workspace
+  #   entrypoint: []
+  #   command:
+  #     - /bin/sh
+  #     - -c
+  #     - |
+  #       terraform init \
+  #       && terraform apply -auto-approve
+  #   env_file:
+  #     - .env.local
+  #   volumes:
+  #     - ./services:/workspace/services:delegated
+  #     - ./terraform:/workspace:delegated
+  #   depends_on:
+  #     - localstack
 
-  test-runner:
-    build:
-      context: .
-      dockerfile: ./tests/Dockerfile
-    container_name: test-runner
-    env_file:
-      - .env.local
-    volumes:
-      - ./tests:/app/tests:delegated
-      - /app/node_modules
-    depends_on:
-      - terraform
-      - localstack
-      - awscli
+  # test-runner:
+  #   build:
+  #     context: .
+  #     dockerfile: ./tests/Dockerfile
+  #   container_name: test-runner
+  #   env_file:
+  #     - .env.local
+  #   volumes:
+  #     - ./tests:/app/tests:delegated
+  #     - /app/node_modules
+  #   depends_on:
+  #     - localstack
+  #     - awscli
 
 networks:
-  default:
+  localstack_network:
     driver: bridge

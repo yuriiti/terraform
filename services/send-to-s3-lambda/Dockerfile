@@ -13,7 +13,7 @@ RUN yarn install --frozen-lockfile
 # Copy the rest of the application code
 COPY ../../ ./
 
-RUN yarn build
+RUN npx tsc
 
 # Command to run the application
 CMD ["node", "dist/services/send-to-s3-lambda/index.js"]

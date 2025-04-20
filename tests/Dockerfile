@@ -15,4 +15,4 @@ COPY ./ ./tests
 COPY ../jest.config.js ./
 
 # Command to run the application
-CMD ["yarn", "test:watch"]
+CMD ["npx", "jest", "--watchAll", "--silent=false"]

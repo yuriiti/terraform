@@ -16,19 +16,19 @@ resource "aws_sns_topic_subscription" "ping" {
 }
 
 # Создаём очередь для сохранения в S3
-resource "aws_sqs_queue" "save-to-s3" {
-  name = "sns-save-to-s3-queue"
+resource "aws_sqs_queue" "sand_to_s3" {
+  name = "sns-sand-to-s3-queue"
 }
 
 # Подписываем очередь для сохранения в S3 на SNS-топик
 resource "aws_sns_topic_subscription" "to_s3" {
   topic_arn            = aws_sns_topic.incoming.arn
   protocol             = "sqs"
-  endpoint             = aws_sqs_queue.save-to-s3.arn
+  endpoint             = aws_sqs_queue.sand_to_s3.arn
   raw_message_delivery = true
 
   filter_policy = jsonencode({
-    target = ["save-to-s3"]
+    target = ["sand-to-s3"]
   })
 }
 

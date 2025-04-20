@@ -11,7 +11,7 @@ const SPECIFIC_MESSAGE = 'hello world';
 describe('LocalStack SQS', () => {
   afterEach(async () => {
     await deleteAllMessages(sqsClient, 'sns-ping-queue');
-    await deleteAllMessages(sqsClient, 'sns-save-to-s3-queue');
+    await deleteAllMessages(sqsClient, 'sns-sand-to-s3-queue');
     await deleteAllMessages(sqsClient, 'sns-send-email-queue');
   });
 
@@ -48,7 +48,7 @@ describe('LocalStack SQS', () => {
     ) => {
       const [receiveSaveToS3MessageResponse, receiveSandEmailMessageResponse] =
         await Promise.all([
-          receiveMessage(sqsClient, 'sns-save-to-s3-queue'),
+          receiveMessage(sqsClient, 'sns-sand-to-s3-queue'),
           receiveMessage(sqsClient, 'sns-send-email-queue'),
         ]);
 
@@ -76,7 +76,7 @@ describe('LocalStack SQS', () => {
     };
 
     await checkMessages(0, 0);
-    await publishSNS(snsClient, 'save-to-s3', SPECIFIC_MESSAGE);
+    await publishSNS(snsClient, 'sand-to-s3', SPECIFIC_MESSAGE);
     await checkMessages(1, 0);
   });
 });

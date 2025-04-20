@@ -4,11 +4,12 @@
     "description": "A TypeScript application running in Docker",
     "main": "dist/index.js",
     "scripts": {
-        "build": "tsc",
-        "build:service": "bash ./services-build.sh",
+        "build": "yarn build:service && yarn build:terraform",
+        "build:service": "bash ./scripts/services-build.sh",
+        "build:terraform": "bash ./scripts/terraform-build.sh",
         "start": "docker compose --env-file .env.local up --build",
         "test": "jest",
-        "test:watch": "jest --watchAll --silent=false"
+        "test:watch": "bash ./scripts/test-runner.sh"
     },
     "dependencies": {
         "@aws-sdk/client-api-gateway": "^3.787.0",

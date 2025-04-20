@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+# Массив со списком сервисов (укажите необходимые сервисы)
+SERVICES=("send-to-s3-lambda")
 TEMP_DIR="services-builded"
 
 # Функция для сборки образа, создания контейнера и копирования папки
@@ -38,9 +40,6 @@ build_and_extract() {
 
     echo "Готово для сервиса ${SERVICE_NAME}."
 }
-
-# Массив со списком сервисов (укажите необходимые сервисы)
-SERVICES=("send-to-s3-lambda")
 
 for SERVICE in "${SERVICES[@]}"; do
     build_and_extract "${SERVICE}"
