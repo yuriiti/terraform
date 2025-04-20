@@ -37,7 +37,8 @@ services:
     env_file:
       - .env.local
     volumes:
-      - ./terraform:/workspace
+      - ./services:/workspace/services:delegated
+      - ./terraform:/workspace:delegated
     depends_on:
       - localstack
 
@@ -55,30 +56,6 @@ services:
       - terraform
       - localstack
       - awscli
-
-  # ingest-lambda:
-  #   build:
-  #     context: ./services/ingest-lambda
-  #     dockerfile: Dockerfile
-  #   container_name: ingest-lambda
-  #   environment:
-  #     - AWS_ENDPOINT_URL=http://localstack:4566
-  #   volumes:
-  #     - ./services/ingest-lambda:/var/task
-  #   depends_on:
-  #     - localstack
-
-  # email-lambda:
-  #   build:
-  #     context: ./services/email-lambda
-  #     dockerfile: Dockerfile
-  #   container_name: email-lambda
-  #   environment:
-  #     - AWS_ENDPOINT_URL=http://localstack:4566
-  #   volumes:
-  #     - ./services/email-lambda:/var/task
-  #   depends_on:
-  #     - localstack
 
 networks:
   default:

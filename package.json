@@ -4,12 +4,15 @@
     "description": "A TypeScript application running in Docker",
     "main": "dist/index.js",
     "scripts": {
-        "start": "docker compose --env-file .env.local up",
+        "build": "tsc",
+        "build:service": "bash ./services-build.sh",
+        "start": "docker compose --env-file .env.local up --build",
         "test": "jest",
         "test:watch": "jest --watchAll --silent=false"
     },
     "dependencies": {
         "@aws-sdk/client-api-gateway": "^3.787.0",
+        "@aws-sdk/client-lambda": "^3.787.0",
         "@aws-sdk/client-sns": "^3.787.0",
         "@aws-sdk/client-sqs": "^3.787.0",
         "axios": "^1.8.4"
