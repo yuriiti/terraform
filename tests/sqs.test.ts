@@ -1,11 +1,7 @@
-import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
+import { SNSClient } from '@aws-sdk/client-sns';
 import { local } from './config';
-import {
-  DeleteMessageCommand,
-  GetQueueUrlCommand,
-  ReceiveMessageCommand,
-  SQSClient,
-} from '@aws-sdk/client-sqs';
+import { SQSClient } from '@aws-sdk/client-sqs';
+import { deleteAllMessages, publishSNS, receiveMessage } from './utils';
 
 const snsClient = new SNSClient(local);
 const sqsClient = new SQSClient(local);
@@ -13,50 +9,27 @@ const sqsClient = new SQSClient(local);
 const SPECIFIC_MESSAGE = 'hello world';
 
 describe('LocalStack SQS', () => {
-  it('should send a message to SQS', async () => {
-    const command = new PublishCommand({
-      TopicArn: `arn:aws:sns:${process.env.TF_VAR_aws_region}:000000000000:incoming-messages`,
-      Message: JSON.stringify({ target: 'test', message: SPECIFIC_MESSAGE }),
-      MessageAttributes: {
-        target: {
-          DataType: 'String',
-          StringValue: 'test',
-        },
-      },
-    });
-    const response = await snsClient.send(command);
+  afterEach(async () => {
+    await deleteAllMessages(sqsClient, 'sns-ping-queue');
+    await deleteAllMessages(sqsClient, 'sns-save-to-s3-queue');
+    await deleteAllMessages(sqsClient, 'sns-send-email-queue');
+  });
 
-    expect(response).toBeDefined();
-    expect(response.MessageId).toBeDefined();
+  it('should send a message to SQS', async () => {
+    await publishSNS(snsClient, 'ping', SPECIFIC_MESSAGE);
   });
 
   it('should receive a message from SQS', async () => {
-    const getQueueUrlCommand = new GetQueueUrlCommand({
-      QueueName: 'sns-test-queue',
-    });
-    const { QueueUrl } = await sqsClient.send(getQueueUrlCommand);
+    await publishSNS(snsClient, 'ping', SPECIFIC_MESSAGE);
 
-    expect(QueueUrl).toBeDefined();
-
-    const receiveMessageCommand = new ReceiveMessageCommand({
-      QueueUrl: QueueUrl,
-      MaxNumberOfMessages: 10,
-      WaitTimeSeconds: 10,
-    });
-    const receiveMessageResponse = await sqsClient.send(receiveMessageCommand);
-
-    expect(receiveMessageResponse).toBeDefined();
+    const receiveMessageResponse = await receiveMessage(
+      sqsClient,
+      'sns-ping-queue',
+    );
 
     const messages: string[] = [];
 
     for (const message of receiveMessageResponse.Messages || []) {
-      const command = new DeleteMessageCommand({
-        QueueUrl: QueueUrl,
-        ReceiptHandle: message.ReceiptHandle,
-      });
-
-      await sqsClient.send(command);
-
       const body = JSON.parse(message.Body || '{}');
 
       expect(body).toBeDefined();
@@ -66,5 +39,44 @@ describe('LocalStack SQS', () => {
     }
 
     expect(messages).toContain(SPECIFIC_MESSAGE);
+  });
+
+  it('should receive messages from different targets', async () => {
+    const checkMessages = async (
+      saveToS3MustBe: number,
+      sandEmailMustBe: number,
+    ) => {
+      const [receiveSaveToS3MessageResponse, receiveSandEmailMessageResponse] =
+        await Promise.all([
+          receiveMessage(sqsClient, 'sns-save-to-s3-queue'),
+          receiveMessage(sqsClient, 'sns-send-email-queue'),
+        ]);
+
+      expect(receiveSaveToS3MessageResponse).toBeDefined();
+
+      if (saveToS3MustBe > 0) {
+        expect(receiveSaveToS3MessageResponse.Messages).toBeDefined();
+        expect(receiveSaveToS3MessageResponse.Messages?.length).toBe(
+          saveToS3MustBe,
+        );
+      } else {
+        expect(receiveSaveToS3MessageResponse.Messages).toBeUndefined();
+      }
+
+      expect(receiveSandEmailMessageResponse).toBeDefined();
+
+      if (sandEmailMustBe > 0) {
+        expect(receiveSandEmailMessageResponse.Messages).toBeDefined();
+        expect(receiveSandEmailMessageResponse.Messages?.length).toBe(
+          sandEmailMustBe,
+        );
+      } else {
+        expect(receiveSandEmailMessageResponse.Messages).toBeUndefined();
+      }
+    };
+
+    await checkMessages(0, 0);
+    await publishSNS(snsClient, 'save-to-s3', SPECIFIC_MESSAGE);
+    await checkMessages(1, 0);
   });
 });
