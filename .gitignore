@@ -1,23 +1,44 @@
-# Ignore build artifacts
-node_modules/
-volume/
-dist/
+# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
-# Ignore log files
-*.log
+# compiled output
+dist
+tmp
+out-tsc
 
-# Ignore temporary files
-*.tmp
-*.swp
-*.bak
-*.orig
+# dependencies
+node_modules
 
-# Ignore system files
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+
+# System Files
 .DS_Store
 Thumbs.db
 
-# Ignore archives
-*.zip
-*.tar.gz
-*.rar
-*.7z
+.nx/cache
+.nx/workspace-data
+
+test-output
