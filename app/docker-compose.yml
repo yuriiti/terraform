@@ -9,7 +9,7 @@ services:
       - AWS_ACCESS_KEY_ID=${TF_VAR_aws_access_key_id}
       - AWS_SECRET_ACCESS_KEY=${TF_VAR_aws_secret_access_key}
     volumes:
-      - ./volume:/var/lib/localstack
+      - localstack:/var/lib/localstack
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - localstack_network
@@ -26,6 +26,9 @@ services:
       - localstack
     networks:
       - localstack_network
+
+volumes:
+  localstack:
 
 networks:
   localstack_network:
