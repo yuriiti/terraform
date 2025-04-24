@@ -5,7 +5,7 @@
   "nx": {
     "name": "app-e2e",
     "implicitDependencies": [
-      "app"
+      "gateway"
     ],
     "targets": {
       "e2e": {

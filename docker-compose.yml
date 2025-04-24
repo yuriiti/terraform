@@ -27,6 +27,8 @@ services:
     networks:
       - localstack_network
 
+  
+
 volumes:
   localstack:
 

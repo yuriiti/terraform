@@ -7,19 +7,19 @@
       "path": "./apps/app-e2e"
     },
     {
-      "path": "./apps/app"
+      "path": "./apps/gateway"
     },
     {
       "path": "./apps/s3-lambda"
     }
   ],
   "include": [
-      "apps/**/*",
-      "libs/**/*",
-      "tools/**/*",
-      "tests/**/*",
-      "jest.config.ts",
-      "jest.preset.js",
-      "types/**/*.d.ts",
-  ],
+    "apps/**/*",
+    "libs/**/*",
+    "tools/**/*",
+    "tests/**/*",
+    "jest.config.ts",
+    "jest.preset.js",
+    "types/**/*.d.ts"
+  ]
 }
