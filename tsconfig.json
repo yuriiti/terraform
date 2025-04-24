@@ -1,15 +1,16 @@
 {
-  "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "rootDir": ".",
-    "outDir": "./dist",
-    "typeRoots": ["./node_modules/@types"]
-  },
-  "include": ["types.d.ts", "tests/**/*.ts", "services/**/*.ts"],
-  "exclude": ["node_modules", "**/*.spec.ts"]
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": false,
+  "files": [],
+  "references": [
+    {
+      "path": "./apps/app-e2e"
+    },
+    {
+      "path": "./apps/app"
+    },
+    {
+      "path": "./apps/s3-lambda"
+    }
+  ]
 }

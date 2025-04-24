@@ -5,10 +5,6 @@ export const handler = async (event: any) => {
     region: process.env.TF_VAR_aws_region,
   });
 
-  try {
-    console.log('Invoking Lambda function...');
-    console.log('Event:', event, process.env.TF_VAR_aws_region);
-  } catch (error) {
-  } finally {
-  }
+  console.log('Invoking Lambda function...');
+  console.log('Event:', event, process.env.TF_VAR_aws_region);
 };

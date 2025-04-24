@@ -1,0 +1,65 @@
+{
+  "name": "@app/s3-lambda",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "targets": {
+      "build": {
+        "executor": "@nx/esbuild:esbuild",
+        "outputs": [
+          "{options.outputPath}"
+        ],
+        "defaultConfiguration": "production",
+        "options": {
+          "platform": "node",
+          "outputPath": "apps/s3-lambda/dist",
+          "format": [
+            "cjs"
+          ],
+          "bundle": false,
+          "main": "apps/s3-lambda/src/main.ts",
+          "tsConfig": "apps/s3-lambda/tsconfig.app.json",
+          "assets": [
+            "apps/s3-lambda/src/assets"
+          ],
+          "esbuildOptions": {
+            "sourcemap": true,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        },
+        "configurations": {
+          "development": {},
+          "production": {
+            "esbuildOptions": {
+              "sourcemap": false,
+              "outExtension": {
+                ".js": ".js"
+              }
+            }
+          }
+        }
+      },
+      "serve": {
+        "executor": "@nx/js:node",
+        "defaultConfiguration": "development",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "buildTarget": "@app/s3-lambda:build",
+          "runBuildTargetDependencies": false
+        },
+        "configurations": {
+          "development": {
+            "buildTarget": "@app/s3-lambda:build:development"
+          },
+          "production": {
+            "buildTarget": "@app/s3-lambda:build:production"
+          }
+        }
+      }
+    }
+  }
+}
