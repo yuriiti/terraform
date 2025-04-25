@@ -5,71 +5,40 @@
     "nx": {
         "targets": {
             "build": {
-                "executor": "@nx/esbuild:esbuild",
-                "outputs": [
-                    "{options.outputPath}"
-                ],
-                "defaultConfiguration": "production",
-                "options": {
-                    "platform": "node",
-                    "outputPath": "apps/s3-lambda/dist",
-                    "format": [
-                        "cjs"
-                    ],
-                    "bundle": false,
-                    "main": "apps/s3-lambda/src/main.ts",
-                    "tsConfig": "apps/s3-lambda/tsconfig.app.json",
-                    "assets": [
-                        "apps/s3-lambda/src/assets"
-                    ],
-                    "esbuildOptions": {
-                        "sourcemap": true,
-                        "outExtension": {
-                            ".js": ".js"
-                        }
-                    }
-                },
-                "configurations": {
-                    "development": {},
-                    "production": {
-                        "esbuildOptions": {
-                            "sourcemap": false,
-                            "outExtension": {
-                                ".js": ".js"
-                            }
-                        }
-                    }
-                }
-            },
-            "serve": {
-                "executor": "@nx/js:node",
+                "executor": "@nx/webpack:webpack",
                 "defaultConfiguration": "development",
-                "dependsOn": [
-                    "build"
-                ],
                 "options": {
-                    "buildTarget": "@app/s3-lambda:build",
-                    "runBuildTargetDependencies": false
+                    "main": "apps/s3-lambda/src/main.ts",
+                    "target": "node",
+                    "compiler": "tsc",
+                    "tsConfig": "apps/s3-lambda/tsconfig.app.json",
+                    "outputPath": "dist/apps/s3-lambda",
+                    "deleteOutputPath": true,
+                    "webpackConfig": "apps/s3-lambda/webpack.config.js"
                 },
                 "configurations": {
                     "development": {
-                        "buildTarget": "@app/s3-lambda:build"
+                        "watch": true,
+                        "watchOptions": {
+                            "poll": 1000
+                        },
+                        "sourceMap": true,
+                        "optimization": false,
+                        "outputHashing": "none"
                     },
                     "production": {
-                        "buildTarget": "@app/s3-lambda:build"
+                        "generatePackageJson": true,
+                        "sourceMap": false,
+                        "optimization": true,
+                        "outputHashing": "all"
                     }
                 }
             },
-            "build-package": {
-                "executor": "nx:run-commands",
-                "dependsOn": [
-                    "build"
-                ],
+            "dev": {
+                "executor": "@nx/js:node",
                 "options": {
-                    "commands": [
-                        "cd apps/s3-lambda/dist && zip -r s3-lambda.zip ."
-                    ],
-                    "parallel": false
+                    "buildTarget": "s3-lambda:build:development",
+                    "watch": true
                 }
             }
         }
