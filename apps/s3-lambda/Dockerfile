@@ -1,19 +1,22 @@
 FROM node:22-alpine
 
-# Set the working directory
-WORKDIR /var/task
+WORKDIR /workspace
 
-# Copy package.json and package-lock.json
-COPY ../../package*.json ./
-COPY ../../yarn.lock ./
+RUN npm install -g nx nodemon
 
-# Install dependencies
+COPY package.json yarn.lock ./
+
 RUN yarn install --frozen-lockfile
 
-# Copy the rest of the application code
-COPY ../../ ./
+COPY . .
 
-RUN npx tsc
+# RUN nx run s3-lambda:package-local
 
-# Command to run the application
-CMD ["node", "dist/services/send-to-s3-lambda/index.js"]
+#  "cd dist/apps/s3-lambda && zip -r s3-lambda.zip ."
+
+# RUN chmod +x ./apps/s3-lambda/docker-entrypoint.sh
+# ENTRYPOINT ["./apps/s3-lambda/docker-entrypoint.sh"]
+
+CMD ["npx", "nx", "serve", "s3-lambda"]
+
+# ENTRYPOINT ['tail', '-f', '/dev/null']

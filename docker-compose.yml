@@ -1,53 +1,70 @@
 services:
-  ep-localstack:
-    image: localstack/localstack:latest
-    container_name: ${LOCALSTACK_HOST}
-    ports:
-      - '${LOCALSTACK_PORT}:4566'
-    environment:
-      - SERVICES=apigateway,iam,sns,sqs,lambda,s3,cloudwatch,cloudwatch,logs,ses,ecr
-      - AWS_ACCESS_KEY_ID=${TF_VAR_aws_access_key_id}
-      - AWS_SECRET_ACCESS_KEY=${TF_VAR_aws_secret_access_key}
-    volumes:
-      - localstack:/var/lib/localstack
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - localstack_network
+  # ep-localstack:
+  #   image: localstack/localstack:latest
+  #   container_name: ${LOCALSTACK_HOST}
+  #   ports:
+  #     - '${LOCALSTACK_PORT}:4566'
+  #   environment:
+  #     - SERVICES=apigateway,iam,sns,sqs,lambda,s3,cloudwatch,cloudwatch,logs,ses,ecr
+  #     - AWS_ACCESS_KEY_ID=${TF_VAR_aws_access_key_id}
+  #     - AWS_SECRET_ACCESS_KEY=${TF_VAR_aws_secret_access_key}
+  #   volumes:
+  #     - ep-localstack:/var/lib/localstack
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   networks:
+  #     - localstack_network
 
-  ep-awscli:
-    image: amazon/aws-cli:latest
-    container_name: awscli
-    entrypoint: ['tail', '-f', '/dev/null']
-    environment:
-      AWS_ACCESS_KEY_ID: ${TF_VAR_aws_access_key_id}
-      AWS_SECRET_ACCESS_KEY: ${TF_VAR_aws_secret_access_key}
-      AWS_DEFAULT_REGION: ${TF_VAR_aws_region}
-    depends_on:
-      - ep-localstack
-    networks:
-      - localstack_network
+  # ep-awscli:
+  #   image: amazon/aws-cli:latest
+  #   container_name: awscli
+  #   entrypoint: ['tail', '-f', '/dev/null']
+  #   environment:
+  #     AWS_ACCESS_KEY_ID: ${TF_VAR_aws_access_key_id}
+  #     AWS_SECRET_ACCESS_KEY: ${TF_VAR_aws_secret_access_key}
+  #     AWS_DEFAULT_REGION: ${TF_VAR_aws_region}
+  #   depends_on:
+  #     - ep-localstack
+  #   networks:
+  #     - localstack_network
 
   ep-app-gateway:
     container_name: gateway
     build:
       context: .
       dockerfile: ./apps/gateway/Dockerfile
-      target: watch
     ports:
       - '3000:3000'
     volumes:
       - ./apps/gateway:/workspace/apps/gateway:delegated
-      - /workspace/node_modules
+      - ep-node-modules:/workspace/node_modules
       - /workspace/dist
     env_file:
       - ./.env.local
-    depends_on:
-      - ep-localstack
+    # depends_on:
+    # - ep-localstack
     networks:
       - localstack_network
 
+  # ep-app-s3-lambda:
+  #   container_name: s3-lambda
+  #   build:
+  #     context: .
+  #     dockerfile: ./apps/s3-lambda/Dockerfile
+  #   volumes:
+  #     - ./apps/s3-lambda:/workspace/apps/s3-lambda:delegated
+  #     - ep-node-modules:/workspace/node_modules
+  #     - /workspace/dist
+  #   env_file:
+  #     - ./.env.local
+  #   depends_on:
+  #     - ep-localstack
+  #     - ep-awscli
+  #   networks:
+  #     - localstack_network
+
 volumes:
-  localstack:
+  ep-localstack:
+  ep-node-modules:
 
 networks:
   localstack_network:

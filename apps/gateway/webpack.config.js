@@ -1,20 +1,11 @@
-const { NxAppWebpackPlugin } = require('@nx/webpack/app-plugin');
-const { join } = require('path');
+const { composePlugins, withNx } = require('@nx/webpack');
 
-module.exports = {
-  output: {
-    path: join(__dirname, 'dist'),
-  },
-  plugins: [
-    new NxAppWebpackPlugin({
-      target: 'node',
-      compiler: 'tsc',
-      main: './src/main.ts',
-      tsConfig: './tsconfig.app.json',
-      assets: ['./src/assets'],
-      optimization: false,
-      outputHashing: 'none',
-      generatePackageJson: true,
-    }),
-  ],
-};
+// Nx plugins for webpack.
+module.exports = composePlugins(withNx(), (config) => {
+  // Note: This was added by an Nx migration. Webpack builds are required to have a corresponding Webpack config file.
+  // See: https://nx.dev/recipes/webpack/webpack-config-setup
+  config.devtool = 'source-map';
+  config.output.filename = 'main.js';
+
+  return config;
+});

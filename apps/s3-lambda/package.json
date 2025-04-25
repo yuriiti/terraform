@@ -53,22 +53,21 @@
                 },
                 "configurations": {
                     "development": {
-                        "buildTarget": "@app/s3-lambda:build:development"
+                        "buildTarget": "@app/s3-lambda:build"
                     },
                     "production": {
-                        "buildTarget": "@app/s3-lambda:build:production"
+                        "buildTarget": "@app/s3-lambda:build"
                     }
                 }
             },
-            "package-local": {
+            "build-package": {
                 "executor": "nx:run-commands",
                 "dependsOn": [
                     "build"
                 ],
                 "options": {
                     "commands": [
-                        "cd dist/apps/s3-lambda && zip -r s3-lambda.zip .",
-                        "aws --endpoint-url=http://localstack:4566 lambda update-function-code --function-name s3-lambda --zip-file fileb://s3-lambda.zip"
+                        "cd apps/s3-lambda/dist && zip -r s3-lambda.zip ."
                     ],
                     "parallel": false
                 }
