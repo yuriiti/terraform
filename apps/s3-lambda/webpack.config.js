@@ -11,7 +11,7 @@ module.exports = composePlugins(withNx(), (config) => {
   config.plugins.push(
     new ZipPlugin({
       filename: 's3-lambda.zip',
-      path: '../..',
+      path: '../../lambdas',
       pathPrefix: '',
       include: [/\.js$/, /\.json$/],
     })

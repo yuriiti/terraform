@@ -4,6 +4,7 @@
 dist
 tmp
 out-tsc
+lambdas
 
 # dependencies
 node_modules

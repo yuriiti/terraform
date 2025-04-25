@@ -54,6 +54,7 @@ services:
       target: dev
     volumes:
       - ./apps/s3-lambda:/workspace/apps/s3-lambda:delegated
+      - ./lambdas/s3-lambda:/workspace/dist/lambdas:delegated
       - ep-node-modules:/workspace/node_modules
       - /workspace/dist
     env_file:

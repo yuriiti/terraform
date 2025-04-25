@@ -37,7 +37,7 @@
             "dev": {
                 "executor": "@nx/js:node",
                 "options": {
-                    "buildTarget": "s3-lambda:build:development",
+                    "buildTarget": "@app/s3-lambda:build:development",
                     "watch": true
                 }
             }
