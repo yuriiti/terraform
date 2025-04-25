@@ -1,22 +1,15 @@
-FROM node:22-alpine
+FROM node:22-alpine AS base
 
+FROM base AS deps
 WORKDIR /workspace
 
-RUN npm install -g nx nodemon
-
-COPY package.json yarn.lock ./
+COPY *.json yarn.lock *.mjs ./
+COPY ./apps/s3-lambda ./apps/s3-lambda
 
 RUN yarn install --frozen-lockfile
 
-COPY . .
+FROM deps AS dev
+ENV NODE_ENV=development
+ENV NX_DAEMON=false
 
-# RUN nx run s3-lambda:package-local
-
-#  "cd dist/apps/s3-lambda && zip -r s3-lambda.zip ."
-
-# RUN chmod +x ./apps/s3-lambda/docker-entrypoint.sh
-# ENTRYPOINT ["./apps/s3-lambda/docker-entrypoint.sh"]
-
-CMD ["npx", "nx", "serve", "s3-lambda"]
-
-# ENTRYPOINT ['tail', '-f', '/dev/null']
+CMD ["npx", "nx", "run", "s3-lambda:dev"]
